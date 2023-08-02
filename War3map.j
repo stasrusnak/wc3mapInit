@@ -4477,9 +4477,7 @@ endif
 endfunction
 function CREe takes nothing returns nothing
 call SetPlayerTechMaxAllowed(GetEnumPlayer(),$52303030,70)
-endfunction
-
- 
+endfunction 
 
 function CreateGrid takes player pl  returns nothing   
     local real GRID_X 
@@ -4489,20 +4487,41 @@ function CreateGrid takes player pl  returns nothing
     local integer sosy = 0  
     local integer p 
     local image whichImage
-    local integer indexArray = 0    
-    // call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Заполнен ли массив = " ) 
-
-    set p = GetPlayerId(pl)
-
+    local integer indexArray = 0     
+    set p = GetPlayerId(pl) 
     if p == 0 then
         set GRID_X = -7874.0
-        set GRID_Y = 5122.0 
+        set GRID_Y = 5115.0 
         set TOP_GRID_Y = GRID_Y  
     elseif p == 1 then
-        set GRID_X = -7868.0
-        set GRID_Y = 2506.0 
+        set GRID_X = -7874.0
+        set GRID_Y = 2552.0 
         set TOP_GRID_Y = GRID_Y 
-    endif 
+    elseif p == 2 then
+        set GRID_X = -2752.0
+        set GRID_Y = 5115.0 
+        set TOP_GRID_Y = GRID_Y 
+    elseif p == 3 then
+        set GRID_X = -2754.0
+        set GRID_Y = 2562.0 
+        set TOP_GRID_Y = GRID_Y 
+    elseif p == 4 then
+        set GRID_X = 1215.0
+        set GRID_Y = 5115.0
+        set TOP_GRID_Y = GRID_Y 
+    elseif p == 5 then
+        set GRID_X = 1215.0
+        set GRID_Y = 2552.0 
+        set TOP_GRID_Y = GRID_Y 
+    elseif p == 6 then
+        set GRID_X = 6335.0
+        set GRID_Y = 5115.0 
+        set TOP_GRID_Y = GRID_Y 
+    elseif p == 7 then
+        set GRID_X = 6335.0
+        set GRID_Y = 2562.0 
+        set TOP_GRID_Y = GRID_Y 
+    endif  
 
     loop
         exitwhen sosi > 12    
@@ -4512,7 +4531,7 @@ function CreateGrid takes player pl  returns nothing
             call SetImageRenderAlways(whichImage, true) 
             call ShowImage(whichImage, true)  
             call SaveImageHandle(HASH, GetHandleId(pl), indexArray, whichImage)   
-            call BJDebugMsg(I2S(indexArray))
+            // call BJDebugMsg(I2S(indexArray))
             set GRID_Y = GRID_Y - 128.0
             set sosy = sosy + 1
             set indexArray = indexArray + 1
@@ -4525,23 +4544,16 @@ function CreateGrid takes player pl  returns nothing
         set sosi = sosi + 1
         set indexArray = indexArray + 1
     endloop   
-
     set GRID_X = 0
     set GRID_Y = 0
     set TOP_GRID_Y = GRID_Y   
 endfunction
 
 
-function ClearGrid takes player pl returns nothing   
-    local real GRID_X 
-    local real GRID_Y 
-    local real TOP_GRID_Y 
-    local integer sosi = 0 
-    local integer sosy = 0  
-    local integer p  
+function ClearGrid takes player pl returns nothing    
     local image Img
-    local integer indexArray = 0    
-    // call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Заполнен ли массив = " ) 
+    local integer p 
+    local integer indexArray = 0     
     set p = GetPlayerId(pl) 
     loop
         exitwhen indexArray >= 233  
@@ -4555,17 +4567,18 @@ function ClearGrid takes player pl returns nothing
 endfunction
 
  
-
 function CRX takes nothing returns nothing  
  
   //    call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Игрок номер = "+I2S(p)) 
     local player p = GetTriggerPlayer()  
-    if GetEventPlayerChatString()=="-g" then  
-        call CreateGrid(p)  
+    if GetEventPlayerChatString()=="-g" then     
+        if HaveSavedHandle(HASH, GetHandleId(p), 100) then
+            call ClearGrid(p) 
+        else
+            call CreateGrid(p)   
+        endif 
     endif
-    if GetEventPlayerChatString()=="-ug" then  
-         call ClearGrid(p)
-    endif 
+ 
 
 if GetEventPlayerChatString()=="-air" then
     set BE=WO
@@ -26470,16 +26483,7 @@ call TriggerRegisterPlayerChatEvent(E5,Player(3),"-g",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(4),"-g",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(5),"-g",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(6),"-g",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(7),"-g",true)
-
-call TriggerRegisterPlayerChatEvent(E5,Player(0),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(1),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(2),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(3),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(4),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(5),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(6),"-ug",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(7),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(7),"-g",true) 
 
 call TriggerRegisterPlayerChatEvent(E5,Player(0),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(1),"-air",true)
@@ -26488,9 +26492,7 @@ call TriggerRegisterPlayerChatEvent(E5,Player(3),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(4),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(5),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(6),"-air",true)
-call TriggerRegisterPlayerChatEvent(E5,Player(7),"-air",true)
-
-
+call TriggerRegisterPlayerChatEvent(E5,Player(7),"-air",true) 
 call TriggerRegisterPlayerChatEvent(E5,Player(0),"-range",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(1),"-range",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(2),"-range",true)
