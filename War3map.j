@@ -24,10 +24,10 @@ boolean modeNS=false
 boolean modeCC=false
 boolean modeAC=false
 boolean modeNC=false
+ 
+ 
 
-
-
-
+hashtable HASH = null
 //Modes
 integer array RolledUnits
 gamecache BO=null
@@ -2143,6 +2143,14 @@ integer f__arg_this
 // MapConfig declaration
 integer array WAVE_KICK_VALUE
 integer WAVE_KICK_DISABLE_AT
+
+boolean GridUnSetPlayer0 = false
+boolean GridUnSetPlayer1 = false
+boolean GridUnSetPlayer2 = false
+boolean GridUnSetPlayer3 = false
+boolean GridUnSetPlayer4 = false
+boolean GridUnSetPlayer5 = false
+
 
 endglobals
 native UnitAlive takes unit id_1 returns boolean
@@ -4471,67 +4479,98 @@ function CREe takes nothing returns nothing
 call SetPlayerTechMaxAllowed(GetEnumPlayer(),$52303030,70)
 endfunction
 
+ 
 
-function CreateUnitAndGetShadow takes real xPosos, real yPosos returns image 
-    // CreateImage(file, a, b, 0, GetUnitX(u), GetUnitY(u), 0, a/2, b/2, 0, 2) 
-   local image whichImage = CreateImage("war3mapImported\\grid.blp",128,128,0, xPosos, yPosos, 0,128/2,128/2,0,3) 
-    // call SetImageRenderAlways(whichImage,true) 
-    // call ShowImage(whichImage,true)  
-    return whichImage
-endfunction
+function CreateGrid takes player pl  returns nothing   
+    local real GRID_X 
+    local real GRID_Y 
+    local real TOP_GRID_Y 
+    local integer sosi = 0 
+    local integer sosy = 0  
+    local integer p 
+    local image whichImage
+    local integer indexArray = 0    
+    // call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Заполнен ли массив = " ) 
 
+    set p = GetPlayerId(pl)
 
-function CreateGrid takes nothing returns nothing 
-    local image array GridSystem
-    local integer i = 0 
-    local real gridX = -7872.0
-    local real gridY = 5191.0
-
+    if p == 0 then
+        set GRID_X = -7874.0
+        set GRID_Y = 5122.0 
+        set TOP_GRID_Y = GRID_Y  
+    elseif p == 1 then
+        set GRID_X = -7868.0
+        set GRID_Y = 2506.0 
+        set TOP_GRID_Y = GRID_Y 
+    endif 
 
     loop
-        exitwhen i > 12     
+        exitwhen sosi > 12    
+        loop
+            exitwhen sosy > 16      
+            set whichImage = CreateImage("war3mapImported\\grid.blp",128,128,0, GRID_X, GRID_Y , 0,128/2,128/2,0,3) 
+            call SetImageRenderAlways(whichImage, true) 
+            call ShowImage(whichImage, true)  
+            call SaveImageHandle(HASH, GetHandleId(pl), indexArray, whichImage)   
+            call BJDebugMsg(I2S(indexArray))
+            set GRID_Y = GRID_Y - 128.0
+            set sosy = sosy + 1
+            set indexArray = indexArray + 1
+            if sosy > 16 then
+                set GRID_Y = TOP_GRID_Y
+            endif
+        endloop   
+        set GRID_X = GRID_X + 128.0 
+        set sosy = 0  
+        set sosi = sosi + 1
+        set indexArray = indexArray + 1
+    endloop   
 
-        set GridSystem[i] = CreateUnitAndGetShadow(gridX, gridY)
-        call SetImageRenderAlways(GridSystem[i],true) 
-        call ShowImage(GridSystem[i],true) 
-
-        set gridX = gridX + 128.0
-        set i = i + 1
-    endloop 
-    // local integer i = 0
-    // local real gridX = -7872.0
-    // local real gridY = 5191.0
-
-    // loop
-    //     exitwhen i > 4
-    //     // call CreateUnitAndGetShadow(gridX, gridY)
- 
-    //     call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff33b822NO 123123213213.")
-    //     // set gridX = gridX + 128
-    //     set i = i + 1
-    // endloop 
-    
+    set GRID_X = 0
+    set GRID_Y = 0
+    set TOP_GRID_Y = GRID_Y   
 endfunction
+
+
+function ClearGrid takes player pl returns nothing   
+    local real GRID_X 
+    local real GRID_Y 
+    local real TOP_GRID_Y 
+    local integer sosi = 0 
+    local integer sosy = 0  
+    local integer p  
+    local image Img
+    local integer indexArray = 0    
+    // call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Заполнен ли массив = " ) 
+    set p = GetPlayerId(pl) 
+    loop
+        exitwhen indexArray >= 233  
+        set Img = LoadImageHandle(HASH, GetHandleId(pl), indexArray) 
+        call SetImageRenderAlways(Img,false) 
+        call ShowImage(Img,false)  
+        call SetImageColor(Img, 255, 255, 255, 0) 
+        set indexArray = indexArray + 1
+    endloop  
+    call FlushChildHashtable(HASH, GetHandleId(pl))
+endfunction
+
  
 
-function CRX takes nothing returns nothing
+function CRX takes nothing returns nothing  
+ 
+  //    call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Игрок номер = "+I2S(p)) 
+    local player p = GetTriggerPlayer()  
+    if GetEventPlayerChatString()=="-g" then  
+        call CreateGrid(p)  
+    endif
+    if GetEventPlayerChatString()=="-ug" then  
+         call ClearGrid(p)
+    endif 
+
 if GetEventPlayerChatString()=="-air" then
-set BE=WO
-set UO="Air" 
-
-call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cff3333AANO Начало.")
-
-call CreateGrid()
-
-// local real gridX = -7872.0
-// local real gridY = 5191
-
-// call CreateUnitAndGetShadow(-7872, 5191)
-// call CreateUnitAndGetShadow(-7936, 5191) 
-
-call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,10.,"|cffe40dd9NO Конец.")
-
-endif
+    set BE=WO
+    set UO="Air"
+endif 
 if GetEventPlayerChatString()=="-range" then
 set BE=ZO
 set UO="Range"
@@ -24765,8 +24804,12 @@ local integer AVV
 local integer CFV
 local trigger initTrig
 local integer i
+
+set HASH = InitHashtable()
+
+
 call initGlobals()
-call InitCustomTriggers(  )
+call InitCustomTriggers(  ) 
 set i_1=0
 set j=0
 call auraStore()
@@ -26420,6 +26463,24 @@ call TriggerRegisterPlayerChatEvent(V5,Player(6),"-unarmored",true)
 call TriggerRegisterPlayerChatEvent(V5,Player(7),"-unarmored",true)
 call TriggerAddAction(V5,ref_function_COX)
 set E5=CreateTrigger()
+call TriggerRegisterPlayerChatEvent(E5,Player(0),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(1),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(2),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(3),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(4),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(5),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(6),"-g",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(7),"-g",true)
+
+call TriggerRegisterPlayerChatEvent(E5,Player(0),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(1),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(2),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(3),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(4),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(5),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(6),"-ug",true)
+call TriggerRegisterPlayerChatEvent(E5,Player(7),"-ug",true)
+
 call TriggerRegisterPlayerChatEvent(E5,Player(0),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(1),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(2),"-air",true)
@@ -26428,6 +26489,8 @@ call TriggerRegisterPlayerChatEvent(E5,Player(4),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(5),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(6),"-air",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(7),"-air",true)
+
+
 call TriggerRegisterPlayerChatEvent(E5,Player(0),"-range",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(1),"-range",true)
 call TriggerRegisterPlayerChatEvent(E5,Player(2),"-range",true)

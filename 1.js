@@ -1,9 +1,12 @@
 
 
-if (10 - 15 < 10 / 2) {
-    console.log('true')
-}else{
-    console.log('fasle')
+let text = "";
+let i = 0;
+do {
+  text += i + " ";
+  i++;
+  console.log(text)
 }
+while (i < 5);
 
-console.log(10 - 15 < 10 / 2)
+console.log(text)
